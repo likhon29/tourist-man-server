@@ -97,9 +97,9 @@ async function run() {
     app.get("/myReviews", verifyJWT, async (req, res) => {
       const decoded = req.decoded;
       console.log("inside reviews api", decoded);
-    //   if(decoded.email !== req.query.email){
-    //    return res.status(403).send({message: 'unauthorized access'})
-    // }
+      //   if(decoded.email !== req.query.email){
+      //    return res.status(403).send({message: 'unauthorized access'})
+      // }
       let query = {};
 
       console.log(req.headers.authorization);
@@ -114,23 +114,37 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+
+    app.get("/myReview/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const service = await reviewCollection.findOne(query);
+      res.send(service);
+    });
+
     app.post("/reviews", async (req, res) => {
       const reviews = req.body;
       const result = await reviewCollection.insertOne(reviews);
       res.send(result);
     });
-    app.patch('/myReview/:id', async (req, res) => {
+    app.patch("/myReview/:id", async (req, res) => {
+      
       const id = req.params.id;
-      const status = req.body.status
-      const query = { _id: ObjectId(id) }
+      const review = req.body;
+      const query = { _id: ObjectId(id) };
+      console.log(review);
+      const option = { upsert: true};
       const updatedDoc = {
-          $set:{
-              status: status
-          }
-      }
-      const result = await orderCollection.updateOne(query, updatedDoc);
+        $set: {
+          reviewContent: review.reviewContent,
+          ratings: review.ratings
+        },
+        
+      };
+      
+      const result = await reviewCollection.updateOne(query, updatedDoc,option);
       res.send(result);
-  })
+    });
     app.delete("/myReview/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
