@@ -97,9 +97,9 @@ async function run() {
     app.get("/myReviews", verifyJWT, async (req, res) => {
       const decoded = req.decoded;
       console.log("inside reviews api", decoded);
-      if (decoded.email !== req.query.email) {
-        res.status(403).send({ message: "unauthorized access" });
-      }
+    //   if(decoded.email !== req.query.email){
+    //    return res.status(403).send({message: 'unauthorized access'})
+    // }
       let query = {};
 
       console.log(req.headers.authorization);
@@ -119,6 +119,18 @@ async function run() {
       const result = await reviewCollection.insertOne(reviews);
       res.send(result);
     });
+    app.patch('/myReview/:id', async (req, res) => {
+      const id = req.params.id;
+      const status = req.body.status
+      const query = { _id: ObjectId(id) }
+      const updatedDoc = {
+          $set:{
+              status: status
+          }
+      }
+      const result = await orderCollection.updateOne(query, updatedDoc);
+      res.send(result);
+  })
     app.delete("/myReview/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
