@@ -91,8 +91,10 @@ async function run() {
       }
       const cursor = reviewCollection.find(query);
       const sortedReviews = cursor.sort({ date: -1 });
-      const result = await cursor.toArray();
+      
+      const result = await sortedReviews.toArray();
       res.send(result);
+      console.log(result);
     });
     app.get("/myReviews", verifyJWT, async (req, res) => {
       const decoded = req.decoded;
@@ -128,21 +130,23 @@ async function run() {
       res.send(result);
     });
     app.patch("/myReview/:id", async (req, res) => {
-      
       const id = req.params.id;
       const review = req.body;
       const query = { _id: ObjectId(id) };
       console.log(review);
-      const option = { upsert: true};
+      const option = { upsert: true };
       const updatedDoc = {
         $set: {
           reviewContent: review.reviewContent,
-          ratings: review.ratings
+          ratings: review.ratings,
         },
-        
       };
-      
-      const result = await reviewCollection.updateOne(query, updatedDoc,option);
+
+      const result = await reviewCollection.updateOne(
+        query,
+        updatedDoc,
+        option
+      );
       res.send(result);
     });
     app.delete("/myReview/:id", async (req, res) => {
