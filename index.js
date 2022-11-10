@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.epizi.mongodb.net/?retryWrites=true&w=majority`;
-console.log(uri);
+
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -91,10 +91,9 @@ async function run() {
       }
       const cursor = reviewCollection.find(query);
       const sortedReviews = cursor.sort({ date: -1 });
-      
+
       const result = await sortedReviews.toArray();
       res.send(result);
-      console.log(result);
     });
     app.get("/myReviews", verifyJWT, async (req, res) => {
       const decoded = req.decoded;
